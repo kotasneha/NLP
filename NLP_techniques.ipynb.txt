@@ -1,0 +1,262 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**module-1**"
+      ],
+      "metadata": {
+        "id": "UWcLBmAwg-9y"
+      }
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "WOuby0QJfGzD"
+      },
+      "outputs": [],
+      "source": [
+        "import pandas as pd\n",
+        "import nltk\n",
+        "import spacy\n",
+        "from nltk.tokenize import word_tokenize\n",
+        "from nltk.corpus import stopwords\n",
+        "from nltk.stem import WordNetLemmatizer"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "nltk.download('punkt')\n",
+        "nltk.download('stopwords')\n",
+        "nltk.download('averaged_perceptron_tagger')\n",
+        "nltk.download('wordnet')\n",
+        "nltk.download('punkt_tab')\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "N3OBZFwdfhd0",
+        "outputId": "6958f217-53ef-4393-a1f0-82e352c31ed0"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "[nltk_data] Downloading package punkt to /root/nltk_data...\n",
+            "[nltk_data]   Package punkt is already up-to-date!\n",
+            "[nltk_data] Downloading package stopwords to /root/nltk_data...\n",
+            "[nltk_data]   Unzipping corpora/stopwords.zip.\n",
+            "[nltk_data] Downloading package averaged_perceptron_tagger to\n",
+            "[nltk_data]     /root/nltk_data...\n",
+            "[nltk_data]   Unzipping taggers/averaged_perceptron_tagger.zip.\n",
+            "[nltk_data] Downloading package wordnet to /root/nltk_data...\n",
+            "[nltk_data] Downloading package punkt_tab to /root/nltk_data...\n",
+            "[nltk_data]   Unzipping tokenizers/punkt_tab.zip.\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "True"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 4
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = pd.read_csv('/content/questions_answers.csv')"
+      ],
+      "metadata": {
+        "id": "ntK7oEuDf_tv"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "output_csv = 'processed_questions.csv'"
+      ],
+      "metadata": {
+        "id": "3fxHyRfGgJwF"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['tokens'] = df['Question'].apply(word_tokenize)"
+      ],
+      "metadata": {
+        "id": "vvFPfpVwgOjZ"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stop_words = set(stopwords.words('english'))\n",
+        "df['filtered_tokens'] = df['tokens'].apply(lambda x: [word for word in x if word.lower() not in stop_words])"
+      ],
+      "metadata": {
+        "id": "xSRq8fSvgT27"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "lemmatizer = WordNetLemmatizer()\n",
+        "df['lemmatized_tokens'] = df['filtered_tokens'].apply(lambda x: [lemmatizer.lemmatize(word) for word in x])"
+      ],
+      "metadata": {
+        "id": "nBcMbeOogcfh"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['processed_questions'] = df['lemmatized_tokens'].apply(lambda x: '-'.join(x))"
+      ],
+      "metadata": {
+        "id": "mB7ZJBczgpaY"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df[['processed_questions', 'Answer']].to_csv(output_csv, index=False)\n"
+      ],
+      "metadata": {
+        "id": "OLC2adWNgwur"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**Module-2**"
+      ],
+      "metadata": {
+        "id": "MqpyZ4gbg0Ua"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = pd.read_csv(output_csv)"
+      ],
+      "metadata": {
+        "id": "gsc5oXT0g9iN"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "user_question = input(\"Ask a question: \")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "yMdRZ9cehSCd",
+        "outputId": "182d616b-8379-469e-c6dc-739422a09203"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Ask a question: deep learning?\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "tokens = word_tokenize(user_question)\n",
+        "tokens = [word for word in tokens if word.lower() not in stop_words]\n",
+        "tokens = [lemmatizer.lemmatize(word) for word in tokens]\n",
+        "processed_question = '-'.join(tokens)"
+      ],
+      "metadata": {
+        "id": "6myOADuWhyaJ"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "answer = df[df['processed_questions'] == processed_question]['Answer']"
+      ],
+      "metadata": {
+        "id": "v73Rag7Th2Sw"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "if not answer.empty:\n",
+        "    print(\"Chatbot: \", answer.values[0])\n",
+        "else:\n",
+        "    print(\"Chatbot: Sorry, I don't know the answer.\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "TJGID8zxh6_h",
+        "outputId": "2093106e-3869-4e4f-f4a1-fbeea71cdadc"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Chatbot:  Deep learning is a subset of machine learning that uses neural networks to model complex patterns in data.\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
